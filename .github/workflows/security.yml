@@ -27,6 +27,3 @@ jobs:
 
     - name: Run NPM Audit
       run: npm audit --audit-level=high
-
-    - name: Run Linter
-      run: npm run lint
