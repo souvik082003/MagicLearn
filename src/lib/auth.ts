@@ -23,23 +23,7 @@ export const authOptions: NextAuthOptions = {
 
                 let user = await User.findOne({ email: credentials.email });
 
-                // Seed admin user if it doesn't exist during login
-                if (credentials.email === "souvik.2003@admin.dev" && credentials.password === "Souvik@2011") {
-                    if (!user) {
-                        const hashedPassword = await bcrypt.hash("Souvik@2011", 10);
-                        user = await User.create({
-                            name: "Souvik Admin",
-                            email: "souvik.2003@admin.dev",
-                            password: hashedPassword,
-                            role: "admin",
-                            xp: 0,
-                        });
-                    } else if (user.role !== "admin") {
-                        // Upgrade existing account to admin if it was created before roles existed
-                        user.role = "admin";
-                        await user.save();
-                    }
-                }
+
 
                 if (!user) {
                     throw new Error("User not found");
