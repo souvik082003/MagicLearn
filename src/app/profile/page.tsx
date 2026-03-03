@@ -172,7 +172,7 @@ export default function ProfilePage() {
                     {/* Settings Form */}
                     <Card className="bg-zinc-900/50 border-zinc-800">
                         <CardHeader>
-                            <CardTitle className="text-lg flex items-center gap-2">
+                            <CardTitle className="text-lg flex items-center gap-2 text-zinc-100">
                                 <SettingsIcon className="w-4 h-4 text-zinc-400" /> Profile Settings
                             </CardTitle>
                         </CardHeader>
@@ -234,7 +234,7 @@ export default function ProfilePage() {
                     {/* Badges & Achievements */}
                     <Card className="bg-zinc-900/50 border-zinc-800">
                         <CardHeader>
-                            <CardTitle className="text-lg flex items-center gap-2">
+                            <CardTitle className="text-lg flex items-center gap-2 text-zinc-100">
                                 <Award className="w-5 h-5 text-yellow-500" /> Achievements
                             </CardTitle>
                         </CardHeader>
@@ -343,7 +343,7 @@ export default function ProfilePage() {
                     {/* Submissions List */}
                     <Card className="bg-zinc-900/50 border-zinc-800">
                         <CardHeader>
-                            <CardTitle className="text-lg flex items-center gap-2">
+                            <CardTitle className="text-lg flex items-center gap-2 text-zinc-100">
                                 <Calendar className="w-5 h-5 text-zinc-400" /> Recent Submissions
                             </CardTitle>
                         </CardHeader>
