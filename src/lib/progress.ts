@@ -1,22 +1,41 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 export function useProgress() {
+    const { data: session, status } = useSession();
     const [completedProblems, setCompletedProblems] = useState<string[]>([]);
 
     useEffect(() => {
-        // Load from local storage on mount
-        const saved = localStorage.getItem("c-learning-hub-progress");
-        if (saved) {
-            try {
-                // eslint-disable-next-line react-hooks/set-state-in-effect
-                setCompletedProblems(JSON.parse(saved));
-            } catch (_e) {
-                console.error("Failed to parse progress saving");
+        if (status === "loading") return;
+
+        if (session?.user) {
+            // Logged in: fetch solved problems from server
+            fetch("/api/profile")
+                .then(res => res.ok ? res.json() : null)
+                .then(data => {
+                    if (data?.user?.solvedProblems) {
+                        setCompletedProblems(data.user.solvedProblems);
+                        // Also sync to localStorage as cache
+                        localStorage.setItem("c-learning-hub-progress", JSON.stringify(data.user.solvedProblems));
+                    }
+                })
+                .catch(() => {
+                    // Fallback to localStorage
+                    const saved = localStorage.getItem("c-learning-hub-progress");
+                    if (saved) {
+                        try { setCompletedProblems(JSON.parse(saved)); } catch { }
+                    }
+                });
+        } else {
+            // Not logged in: use localStorage
+            const saved = localStorage.getItem("c-learning-hub-progress");
+            if (saved) {
+                try { setCompletedProblems(JSON.parse(saved)); } catch { }
             }
         }
-    }, []);
+    }, [session, status]);
 
     const markProblemCompleted = (problemId: string) => {
         setCompletedProblems((prev) => {

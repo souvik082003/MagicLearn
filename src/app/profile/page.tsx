@@ -24,6 +24,11 @@ interface ProfileData {
             Medium: number;
             Hard: number;
         };
+        totalCounts?: {
+            Easy: number;
+            Medium: number;
+            Hard: number;
+        };
         badges?: {
             id: string;
             name: string;
@@ -126,7 +131,8 @@ export default function ProfilePage() {
 
     if (!data) return null;
 
-    const totalQuestions = 100; // Placeholder for total available
+    const tc = data.user.totalCounts || { Easy: 0, Medium: 0, Hard: 0 };
+    const totalQuestions = tc.Easy + tc.Medium + tc.Hard || 1;
     const percentSolved = Math.min(100, Math.round((data.user.solvedCount / totalQuestions) * 100)) || 0;
 
     return (
@@ -282,28 +288,28 @@ export default function ProfilePage() {
                                     <div className="space-y-1">
                                         <div className="flex justify-between text-sm">
                                             <span className="text-green-400 font-medium">Easy</span>
-                                            <span className="text-zinc-300">{data.user.difficultyCounts.Easy} <span className="text-zinc-600 text-xs">/ {data.user.solvedCount > 0 ? '?' : '0'}</span></span>
+                                            <span className="text-zinc-300">{data.user.difficultyCounts.Easy} <span className="text-zinc-600 text-xs">/ {tc.Easy}</span></span>
                                         </div>
                                         <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                                            <div className="h-full bg-green-500 rounded-full" style={{ width: `${(data.user.difficultyCounts.Easy / Math.max(1, data.user.solvedCount)) * 100}%` }}></div>
+                                            <div className="h-full bg-green-500 rounded-full" style={{ width: `${(data.user.difficultyCounts.Easy / Math.max(1, tc.Easy)) * 100}%` }}></div>
                                         </div>
                                     </div>
                                     <div className="space-y-1">
                                         <div className="flex justify-between text-sm">
                                             <span className="text-yellow-400 font-medium">Medium</span>
-                                            <span className="text-zinc-300">{data.user.difficultyCounts.Medium}</span>
+                                            <span className="text-zinc-300">{data.user.difficultyCounts.Medium} <span className="text-zinc-600 text-xs">/ {tc.Medium}</span></span>
                                         </div>
                                         <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                                            <div className="h-full bg-yellow-400 rounded-full" style={{ width: `${(data.user.difficultyCounts.Medium / Math.max(1, data.user.solvedCount)) * 100}%` }}></div>
+                                            <div className="h-full bg-yellow-400 rounded-full" style={{ width: `${(data.user.difficultyCounts.Medium / Math.max(1, tc.Medium)) * 100}%` }}></div>
                                         </div>
                                     </div>
                                     <div className="space-y-1">
                                         <div className="flex justify-between text-sm">
                                             <span className="text-red-400 font-medium">Hard</span>
-                                            <span className="text-zinc-300">{data.user.difficultyCounts.Hard}</span>
+                                            <span className="text-zinc-300">{data.user.difficultyCounts.Hard} <span className="text-zinc-600 text-xs">/ {tc.Hard}</span></span>
                                         </div>
                                         <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                                            <div className="h-full bg-red-500 rounded-full" style={{ width: `${(data.user.difficultyCounts.Hard / Math.max(1, data.user.solvedCount)) * 100}%` }}></div>
+                                            <div className="h-full bg-red-500 rounded-full" style={{ width: `${(data.user.difficultyCounts.Hard / Math.max(1, tc.Hard)) * 100}%` }}></div>
                                         </div>
                                     </div>
                                 </div>

@@ -51,6 +51,12 @@ export async function GET(req: Request) {
             else if (p.difficulty === 'Hard') difficultyCounts.Hard++;
         });
 
+        // Total problems per difficulty for "X / Y" display
+        const totalEasy = await Problem.countDocuments({ difficulty: "Easy" });
+        const totalMedium = await Problem.countDocuments({ difficulty: "Medium" });
+        const totalHard = await Problem.countDocuments({ difficulty: "Hard" });
+        const totalCounts = { Easy: totalEasy, Medium: totalMedium, Hard: totalHard };
+
         // Compute Achievement Badges dynamically
         const solutionCount = await Solution.countDocuments({ userId: user._id });
         const solvedCount = user.solvedProblems?.length || 0;
@@ -67,7 +73,9 @@ export async function GET(req: Request) {
                 email: user.email,
                 xp: user.xp,
                 solvedCount,
+                solvedProblems: user.solvedProblems || [],
                 difficultyCounts,
+                totalCounts,
                 badges
             },
             recentSubmissions: enrichedSubmissions
