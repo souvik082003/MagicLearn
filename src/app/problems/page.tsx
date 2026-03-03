@@ -97,14 +97,22 @@ export default function ProblemsPage() {
 
         let matchesCompany = true;
         if (selectedCompany) {
-            matchesCompany = !!prob.companies?.includes(selectedCompany);
+            matchesCompany = !!prob.companies?.some(c => c.toLowerCase() === selectedCompany.toLowerCase());
         }
 
         return matchesSearch && matchesDifficulty && matchesSource && matchesCompany;
     });
 
-    // Extract all unique companies from the loaded problem set
-    const uniqueCompanies = Array.from(new Set(problems.flatMap(p => p.companies || []))).filter(Boolean).sort();
+    // Extract all unique companies from the loaded problem set, case-insensitive
+    const companyMap = new Map<string, string>();
+    problems.flatMap(p => p.companies || []).filter(Boolean).forEach(c => {
+        const key = c.toLowerCase();
+        if (!companyMap.has(key)) {
+            // Title Case: capitalize first letter
+            companyMap.set(key, c.charAt(0).toUpperCase() + c.slice(1).toLowerCase());
+        }
+    });
+    const uniqueCompanies = Array.from(companyMap.values()).sort();
 
     return (
         <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 min-h-[calc(100vh-3.5rem)] bg-background">

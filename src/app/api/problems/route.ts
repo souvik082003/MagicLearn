@@ -16,8 +16,12 @@ export async function POST(req: Request) {
         await connectToDatabase();
         const data = await req.json();
 
+        const toTitleCase = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
         const problemData = {
             ...data,
+            companies: (data.companies || []).map((c: string) => toTitleCase(c.trim())),
+            topics: (data.topics || []).map((t: string) => toTitleCase(t.trim())),
             authorName: session.user?.name || "Anonymous",
         };
 

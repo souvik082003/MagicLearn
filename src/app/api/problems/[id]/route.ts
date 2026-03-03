@@ -70,6 +70,10 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
             ? { $or: [{ problemId: id }, { _id: id }] }
             : { problemId: id };
 
+        const toTitleCase = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+        if (data.companies) data.companies = data.companies.map((c: string) => toTitleCase(c.trim()));
+        if (data.topics) data.topics = data.topics.map((t: string) => toTitleCase(t.trim()));
+
         const updatedProblem = await Problem.findOneAndUpdate(
             query,
             { $set: data },
