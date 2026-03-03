@@ -332,7 +332,12 @@ export function Workspace({ problem }: WorkspaceProps) {
                             <TabsContent value="description" className="flex-1 overflow-hidden m-0 p-0 outline-none">
                                 <ScrollArea className="h-full">
                                     <div className="p-6 pb-20">
-                                        <h1 className="text-2xl font-bold text-zinc-100 mb-4 tracking-tight">{problem.title}</h1>
+                                        <h1 className="text-2xl font-bold text-zinc-100 mb-4 tracking-tight">
+                                            {problem.id.match(/^MC\d+$/i) && (
+                                                <span className="text-blue-400 mr-2">{problem.id.toUpperCase()}:</span>
+                                            )}
+                                            {problem.title}
+                                        </h1>
 
                                         <div className="flex flex-wrap gap-3 mb-8">
                                             <span className={`px-3 py-1 text-xs rounded-full font-medium ${problem.difficulty === "Easy" ? "bg-green-500/10 text-green-400 border border-green-500/20" :

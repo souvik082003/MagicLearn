@@ -269,7 +269,10 @@ export default function ProblemsPage() {
                                         )}
                                     </div>
                                     <CardTitle className="text-xl group-hover:text-primary transition-colors line-clamp-1">
-                                        {prob.problemNumber ? `${prob.problemNumber}. ` : ""}{prob.title}
+                                        {prob.id?.match(/^MC\d+$/i)
+                                            ? `${prob.id.toUpperCase()}: `
+                                            : prob.problemNumber ? `${prob.problemNumber}. ` : ""
+                                        }{prob.title}
                                     </CardTitle>
                                     <div className="flex justify-between items-center mt-2">
                                         <CardDescription className="flex items-center gap-2">
