@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongoose";
 import { Problem } from "@/models/Problem";
+import { User } from "@/models/User";
+import { Notification } from "@/models/Notification";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 
@@ -46,6 +48,40 @@ export async function PUT(req: Request) {
 
         if (!problem) {
             return NextResponse.json({ error: "Problem not found" }, { status: 404 });
+        }
+
+        // --- Notification triggers ---
+        try {
+            // Notify the submitter about the decision
+            if (problem.submittedBy) {
+                const submitter = await User.findOne({ name: problem.submittedBy });
+                if (submitter) {
+                    await Notification.create({
+                        userId: submitter._id,
+                        type: action === "approve" ? "question_approved" : "question_rejected",
+                        message: action === "approve"
+                            ? `Your question "${problem.title}" has been approved and is now live!`
+                            : `Your question "${problem.title}" was not approved.`,
+                        link: action === "approve" ? `/problems/${problem.problemId}` : "/problems/submit",
+                    });
+                }
+            }
+
+            // If approved, notify all users about the new question
+            if (action === "approve") {
+                const allUsers = await User.find({ role: { $ne: "admin" } }).select("_id").lean();
+                const notifs = allUsers.map((u: any) => ({
+                    userId: u._id,
+                    type: "new_question",
+                    message: `New question available: "${problem.title}"`,
+                    link: `/problems/${problem.problemId}`,
+                }));
+                if (notifs.length > 0) {
+                    await Notification.insertMany(notifs);
+                }
+            }
+        } catch (notifErr) {
+            console.error("Non-fatal: notification creation failed", notifErr);
         }
 
         return NextResponse.json({ message: `Problem ${newStatus} successfully`, problem }, { status: 200 });

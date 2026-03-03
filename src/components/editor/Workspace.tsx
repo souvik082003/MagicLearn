@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { CodeEditor } from "./CodeEditor";
 import { SolutionsTab } from "./SolutionsTab";
 import { executeCode } from "@/lib/piston";
-import { Play, Loader2, CheckCircle2, XCircle, Terminal, List, ChevronLeft, ChevronRight, Shuffle, CloudUpload, Settings, FileText, FlaskConical, Beaker, CheckSquare, Maximize2, RotateCcw, SquareTerminal } from "lucide-react";
+import { Play, Loader2, CheckCircle2, XCircle, Terminal, List, ChevronLeft, ChevronRight, Shuffle, CloudUpload, FileText, FlaskConical, Beaker, CheckSquare, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -34,6 +34,15 @@ interface TestCaseResult {
 export function Workspace({ problem }: WorkspaceProps) {
     const [code, setCode] = useState(problem.template);
     const [language, setLanguage] = useState<SupportedLanguage>(problem.language);
+
+    // Submission history
+    interface SubmissionRecord {
+        _id: string;
+        status: string;
+        language: string;
+        createdAt: string;
+    }
+    const [submissionHistory, setSubmissionHistory] = useState<SubmissionRecord[]>([]);
 
     const handleLanguageChange = (newLang: SupportedLanguage) => {
         setLanguage(newLang);
@@ -104,7 +113,19 @@ export function Workspace({ problem }: WorkspaceProps) {
                 }
             })
             .catch(console.error);
+
+        // Fetch submission history
+        fetchSubmissions();
     }, []);
+
+    const fetchSubmissions = () => {
+        fetch(`/api/submissions?problemId=${problem.id}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.submissions) setSubmissionHistory(data.submissions);
+            })
+            .catch(console.error);
+    };
 
     const handleNavigate = (direction: 'prev' | 'next' | 'shuffle') => {
         if (problemSequence.length === 0) return;
@@ -208,6 +229,8 @@ export function Workspace({ problem }: WorkspaceProps) {
                             language: language
                         })
                     });
+                    // Refresh submission history and switch to submissions tab
+                    fetchSubmissions();
                 } catch (err) {
                     console.error("Failed to record submission", err);
                 }
@@ -272,11 +295,12 @@ export function Workspace({ problem }: WorkspaceProps) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-zinc-100 hover:bg-white/5">
-                        <Settings className="w-4 h-4" />
+                    {/* Profile link */}
+                    <Button variant="ghost" size="sm" asChild className="h-8 text-zinc-400 hover:text-zinc-100 hover:bg-white/5">
+                        <Link href="/profile">
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-orange-400 to-amber-600 shadow-inner border border-white/10"></div>
+                        </Link>
                     </Button>
-                    {/* Simulated avatar */}
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-orange-400 to-amber-600 ml-2 shadow-inner border border-white/10"></div>
                 </div>
             </div>
 
@@ -345,8 +369,48 @@ export function Workspace({ problem }: WorkspaceProps) {
                             <TabsContent value="solutions" className="m-0 h-full">
                                 <SolutionsTab problemId={problem.id} currentCode={code} currentLanguage={language} />
                             </TabsContent>
-                            <TabsContent value="submissions" className="p-6 m-0 text-zinc-500 text-sm">
-                                Your past submissions history.
+                            <TabsContent value="submissions" className="m-0 h-full overflow-hidden">
+                                <ScrollArea className="h-full">
+                                    <div className="p-4">
+                                        {submissionHistory.length === 0 ? (
+                                            <div className="flex flex-col items-center justify-center py-10 text-zinc-500 text-sm">
+                                                <CheckSquare className="w-8 h-8 mb-2 opacity-30" />
+                                                No submissions yet. Submit your solution!
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-0">
+                                                <div className="grid grid-cols-3 gap-4 px-3 py-2 text-[10px] uppercase tracking-wider font-bold text-zinc-600 border-b border-zinc-800">
+                                                    <span>Status</span>
+                                                    <span>Language</span>
+                                                    <span className="text-right">Submitted</span>
+                                                </div>
+                                                {submissionHistory.map((sub, idx) => {
+                                                    const timeAgo = (() => {
+                                                        const diff = Date.now() - new Date(sub.createdAt).getTime();
+                                                        const mins = Math.floor(diff / 60000);
+                                                        if (mins < 1) return "Just now";
+                                                        if (mins < 60) return `${mins} min ago`;
+                                                        const hrs = Math.floor(mins / 60);
+                                                        if (hrs < 24) return `${hrs} hr ago`;
+                                                        const days = Math.floor(hrs / 24);
+                                                        if (days < 30) return `${days}d ago`;
+                                                        return new Date(sub.createdAt).toLocaleDateString();
+                                                    })();
+                                                    return (
+                                                        <div key={sub._id} className={`grid grid-cols-3 gap-4 px-3 py-2.5 text-xs border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors ${idx === 0 ? 'bg-zinc-800/20' : ''}`}>
+                                                            <span className={`font-semibold flex items-center gap-1.5 ${sub.status === 'Accepted' ? 'text-green-500' : 'text-red-400'}`}>
+                                                                {sub.status === 'Accepted' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                                                                {sub.status}
+                                                            </span>
+                                                            <span className="text-zinc-400">{sub.language}</span>
+                                                            <span className="text-zinc-500 text-right">{timeAgo}</span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                </ScrollArea>
                             </TabsContent>
                         </Tabs>
                     </ResizablePanel>

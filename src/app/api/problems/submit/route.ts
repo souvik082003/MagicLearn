@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongoose";
 import { Problem } from "@/models/Problem";
+import { User } from "@/models/User";
+import { Notification } from "@/models/Notification";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 
@@ -42,6 +44,22 @@ export async function POST(req: Request) {
         });
 
         await newProblem.save();
+
+        // Notify all admins about the new submission for review
+        try {
+            const admins = await User.find({ role: "admin" }).select("_id").lean();
+            const notifs = admins.map((admin: any) => ({
+                userId: admin._id,
+                type: "review_needed",
+                message: `New question "${title}" submitted by ${session.user?.name || "a user"} needs review.`,
+                link: "/admin/reviews",
+            }));
+            if (notifs.length > 0) {
+                await Notification.insertMany(notifs);
+            }
+        } catch (notifErr) {
+            console.error("Non-fatal: notification creation failed", notifErr);
+        }
 
         return NextResponse.json({ message: "Question submitted for review!", problem: newProblem }, { status: 201 });
     } catch (error: any) {

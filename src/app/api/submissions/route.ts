@@ -5,6 +5,37 @@ import { User } from "@/models/User";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 
+export async function GET(req: Request) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user?.email) {
+            return NextResponse.json({ submissions: [] }, { status: 200 });
+        }
+
+        await connectToDatabase();
+        const user = await User.findOne({ email: session.user.email });
+        if (!user) {
+            return NextResponse.json({ submissions: [] }, { status: 200 });
+        }
+
+        const url = new URL(req.url);
+        const problemId = url.searchParams.get("problemId");
+
+        const query: any = { userId: user._id };
+        if (problemId) query.problemId = problemId;
+
+        const submissions = await Submission.find(query)
+            .sort({ createdAt: -1 })
+            .limit(20)
+            .lean();
+
+        return NextResponse.json({ submissions }, { status: 200 });
+    } catch (error: any) {
+        console.error("Error fetching submissions:", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+
 export async function POST(req: Request) {
     try {
         const session = await getServerSession(authOptions);
