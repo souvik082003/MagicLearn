@@ -107,7 +107,7 @@ export default function AdminAddProblemPage() {
                 if (ex.image) {
                     html += `<img src="${ex.image}" alt="Example ${i + 1} diagram" style="max-width:100%;border-radius:8px;margin:8px 0 12px" />\n`;
                 }
-                html += `<pre style="background:#1a1a2e;padding:12px;border-radius:8px;margin:8px 0"><code><strong>Input:</strong> ${ex.input}\n<strong>Output:</strong> ${ex.output}</code></pre>\n`;
+                html += `<div style="background:#1a1a2e;padding:12px;border-radius:8px;margin:8px 0;font-family:monospace;"><strong>Input:</strong>\n<pre style="margin:4px 0 12px 0;white-space:pre-wrap;font-family:inherit">${ex.input}</pre><strong>Output:</strong>\n<pre style="margin:4px 0 0 0;white-space:pre-wrap;font-family:inherit">${ex.output}</pre></div>\n`;
                 if (ex.explanation.trim()) {
                     html += `<p style="margin-top:8px;color:#aaa"><strong>Explanation:</strong> ${ex.explanation}</p>\n`;
                 }
@@ -355,7 +355,7 @@ export default function AdminAddProblemPage() {
                                 {/* Input / Output Format */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <Label className="text-zinc-300">Input Format <span className="text-red-500">*</span></Label>
+                                        <Label className="text-zinc-300">Input Format</Label>
                                         <Textarea
                                             value={inputFormat}
                                             onChange={(e) => setInputFormat(e.target.value)}
@@ -364,7 +364,7 @@ export default function AdminAddProblemPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-zinc-300">Output Format <span className="text-red-500">*</span></Label>
+                                        <Label className="text-zinc-300">Output Format</Label>
                                         <Textarea
                                             value={outputFormat}
                                             onChange={(e) => setOutputFormat(e.target.value)}
