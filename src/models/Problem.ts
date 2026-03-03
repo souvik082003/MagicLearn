@@ -33,7 +33,7 @@ const ProblemSchema = new Schema<IProblem>(
         category: { type: String, default: "Custom" },
         language: { type: String, required: true },
         description: { type: String, required: true },
-        template: { type: String, required: true },
+        template: { type: String, default: "" },
         driverCode: { type: String, default: "" },
         authorName: { type: String, default: "System" },
         companies: [{ type: String }],
