@@ -497,20 +497,20 @@ export default function AdminAddProblemPage() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                 <div className="space-y-1">
                                                     <Label className="text-xs text-zinc-500">Input</Label>
-                                                    <Input
+                                                    <Textarea
                                                         value={ex.input}
                                                         onChange={(e) => updateExample(idx, "input", e.target.value)}
                                                         placeholder="matrix = [[1,2,3],[4,5,6],[7,8,9]]"
-                                                        className="bg-zinc-950 border-zinc-800 font-mono text-xs text-zinc-200"
+                                                        className="bg-zinc-950 border-zinc-800 font-mono text-xs text-zinc-200 min-h-[60px]"
                                                     />
                                                 </div>
                                                 <div className="space-y-1">
                                                     <Label className="text-xs text-zinc-500">Output</Label>
-                                                    <Input
+                                                    <Textarea
                                                         value={ex.output}
                                                         onChange={(e) => updateExample(idx, "output", e.target.value)}
                                                         placeholder="[[7,4,1],[8,5,2],[9,6,3]]"
-                                                        className="bg-zinc-950 border-zinc-800 font-mono text-xs text-zinc-200"
+                                                        className="bg-zinc-950 border-zinc-800 font-mono text-xs text-zinc-200 min-h-[60px]"
                                                     />
                                                 </div>
                                             </div>
