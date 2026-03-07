@@ -25,10 +25,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "MagicCode",
-  description: "Learn Programming & Practice Coding Challenges",
-};
+
 
 export default function RootLayout({
   children,
