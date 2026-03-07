@@ -6,6 +6,14 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { Analytics } from "@vercel/analytics/next";
+export const metadata: Metadata = {
+  metadataBase: new URL("https://magiccode-dev.vercel.app"),
+  title: {
+    default: "MagicCode",
+    template: "%s | MagicCode",
+  },
+  description: "Practice coding challenges, DSA learning paths, and improve programming skills on MagicCode.",
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
